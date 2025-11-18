@@ -2,15 +2,29 @@
  * ZenJS JSX Runtime
  *
  * Renders JSX to fine-grained reactive DOM
+ * Powered by @sylphx/zen reactive core
  */
 
-import { effect } from './core/effect.js';
-import type { Signal } from './core/signal.js';
+import { effect } from '@sylphx/zen';
+import type { Zen, ComputedZen } from '@sylphx/zen';
 
 export { Fragment } from './core/fragment.js';
 
 type Props = Record<string, any>;
 type Child = Node | string | number | boolean | null | undefined;
+type ReactiveValue = Zen<any> | ComputedZen<any>;
+
+/**
+ * Check if value is a reactive signal/computed
+ */
+function isReactive(value: any): value is ReactiveValue {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'value' in value &&
+    Object.getOwnPropertyDescriptor(value, 'value') !== undefined
+  );
+}
 
 /**
  * JSX factory function
@@ -67,20 +81,18 @@ function setAttribute(element: Element, key: string, value: any): void {
   }
 
   // Reactive value (Signal or Computed)
-  if (typeof value === 'object' && value !== null && '_version' in value) {
-    const signal = value as Signal;
-
+  if (isReactive(value)) {
     // Special handling for form control values - don't use effect
     // to avoid interfering with user input
     if (key === 'value' && (element instanceof HTMLInputElement ||
                              element instanceof HTMLTextAreaElement ||
                              element instanceof HTMLSelectElement)) {
-      (element as any)[key] = signal.value;
+      (element as any)[key] = value.value;
       return;
     }
 
     effect(() => {
-      setStaticAttribute(element, key, signal.value);
+      setStaticAttribute(element, key, value.value);
     });
     return;
   }
@@ -134,13 +146,12 @@ function appendChild(parent: Element, child: any): void {
   }
 
   // Reactive child (Signal or Computed)
-  if (typeof child === 'object' && child !== null && '_version' in child) {
-    const signal = child as Signal;
+  if (isReactive(child)) {
     const textNode = document.createTextNode('');
     parent.appendChild(textNode);
 
     effect(() => {
-      const value = signal.value;
+      const value = child.value;
       textNode.data = String(value ?? '');
     });
     return;

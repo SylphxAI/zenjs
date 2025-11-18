@@ -3,9 +3,7 @@
  */
 
 import { test, expect } from 'bun:test';
-import { signal, batch } from '../core/signal';
-import { effect } from '../core/effect';
-import { computed } from '../core/computed';
+import { signal, batch, effect, computed } from '../index.js';
 
 test('Signal update performance', () => {
   const sig = signal(0);

@@ -3,9 +3,7 @@
  */
 
 import { test, expect } from 'bun:test';
-import { signal } from '../core/signal';
-import { effect } from '../core/effect';
-import { computed } from '../core/computed';
+import { signal, effect, computed } from '../index.js';
 
 // Measure object size
 function roughSizeOfObject(object: any): number {
@@ -35,40 +33,13 @@ function roughSizeOfObject(object: any): number {
   return bytes;
 }
 
-test('Signal memory - bitfield vs Set structure', () => {
-  // Test with <= 32 subscribers (bitfield mode)
-  const sig1 = signal(0);
-  const effects1: any[] = [];
+test.skip('Signal memory - bitfield vs Set structure (internal implementation, skipped with @sylphx/zen)', () => {
+  // NOTE: This test checks internal implementation details
+  // which are not exposed by @sylphx/zen. The library handles
+  // subscriber management internally with its own optimizations.
 
-  for (let i = 0; i < 30; i++) {
-    effects1.push(effect(() => sig1.value));
-  }
-
-  const subs1 = (sig1 as any)._subscribers;
-  const bitfield1 = (sig1 as any)._bitfield;
-
-  console.log('Bitfield mode (30 subscribers):');
-  console.log('  Structure:', Array.isArray(subs1) ? 'Array[32]' : 'Set');
-  console.log('  Bitfield:', bitfield1.toString(2).padStart(32, '0'));
-  console.log('  Populated slots:', bitfield1.toString(2).split('').filter((b: string) => b === '1').length);
-
-  // Test with > 32 subscribers (Set mode)
-  const sig2 = signal(0);
-  const effects2: any[] = [];
-
-  for (let i = 0; i < 40; i++) {
-    effects2.push(effect(() => sig2.value));
-  }
-
-  const subs2 = (sig2 as any)._subscribers;
-  console.log('\nSet mode (40 subscribers):');
-  console.log('  Structure:', Array.isArray(subs2) ? 'Array[32]' : 'Set');
-  console.log('  Size:', subs2 instanceof Set ? subs2.size : 'N/A');
-
-  // Verify bitfield mode is used for <= 32
-  expect(Array.isArray(subs1)).toBe(true);
-  // Verify Set mode is used for > 32
-  expect(subs2 instanceof Set).toBe(true);
+  console.log('Skipped: Internal memory structure test');
+  console.log('Using @sylphx/zen reactive core');
 });
 
 test('Signal creation overhead', () => {

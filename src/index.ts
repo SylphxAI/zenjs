@@ -2,13 +2,28 @@
  * ZenJS - Ultra-fast, ultra-lightweight reactive framework
  *
  * Beyond SolidJS in performance and simplicity.
+ * Powered by @sylphx/zen reactive core.
  */
 
-// Core primitives
-export { signal, batch, isBatching } from './core/signal.js';
-export { effect, untrack } from './core/effect.js';
-export { computed } from './core/computed.js';
-export { flushSync } from './core/scheduler.js';
+// Core primitives from @sylphx/zen
+import {
+  zen,
+  computed as zenComputed,
+  effect as zenEffect,
+  batch as zenBatch,
+  untrack as zenUntrack,
+  peek as zenPeek,
+  subscribe as zenSubscribe,
+} from '@sylphx/zen';
+
+// Re-export with ZenJS naming
+export { zen as signal };
+export { zenComputed as computed };
+export { zenEffect as effect };
+export { zenBatch as batch };
+export { zenUntrack as untrack };
+export { zenPeek as peek };
+export { zenSubscribe as subscribe };
 
 // Components
 export { For } from './components/For.js';
@@ -19,6 +34,4 @@ export { Switch, Match } from './components/Switch.js';
 export { render, Fragment } from './jsx-runtime.js';
 
 // Types
-export type { Signal } from './core/signal.js';
-export type { Effect } from './core/effect.js';
-export type { Computed } from './core/computed.js';
+export type { Zen as Signal, ComputedZen as Computed } from '@sylphx/zen';
