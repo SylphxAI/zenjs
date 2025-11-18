@@ -1,0 +1,56 @@
+{
+  "name": "zenjs",
+  "version": "0.1.0",
+  "description": "Ultra-fast, ultra-lightweight reactive framework. Beyond SolidJS.",
+  "type": "module",
+  "workspaces": [
+    "demo-app"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "tsup",
+    "test": "bun test",
+    "bench": "bun test --preload ./src/**/*.bench.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "demo": "cd demo-app && bun dev"
+  },
+  "keywords": [
+    "reactive",
+    "signals",
+    "fine-grained",
+    "performance",
+    "framework",
+    "ui"
+  ],
+  "author": "ZenJS Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "^1.1.15",
+    "solid-js": "^1.9.3",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}
