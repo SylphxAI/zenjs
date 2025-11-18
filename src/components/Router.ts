@@ -55,49 +55,65 @@ export function Router(props: RouterProps): Node {
   const marker = document.createComment('router');
   let currentNode: Node | null = null;
   let currentDispose: (() => void) | undefined;
+  let effectDispose: (() => void) | undefined;
 
-  // Effect to update on route change
-  const dispose = effect(() => {
-    // Get current route
-    const path = currentRoute.value;
-    const route = routes.find(r => r.path === path) || null;
+  // Wait for marker to be in DOM before setting up effect
+  queueMicrotask(() => {
+    // Effect to update on route change
+    effectDispose = effect(() => {
+      // Get current route
+      const path = currentRoute.value;
+      const route = routes.find(r => r.path === path) || null;
 
-    // Cleanup previous
-    if (currentNode && currentNode.parentNode) {
-      currentNode.parentNode.removeChild(currentNode);
-      currentNode = null;
-    }
-    if (currentDispose) {
-      currentDispose();
-      currentDispose = undefined;
-    }
+      console.log('[Router] Effect fired:', { path, route: route?.path, hasParent: !!marker.parentNode });
 
-    // Render new route
-    currentNode = untrack(() => {
-      if (route) {
-        return route.component();
-      } else if (fallback) {
-        return fallback();
+      // Cleanup previous
+      if (currentNode && currentNode.parentNode) {
+        currentNode.parentNode.removeChild(currentNode);
+        currentNode = null;
+      }
+      if (currentDispose) {
+        currentDispose();
+        currentDispose = undefined;
+      }
+
+      // Render new route
+      currentNode = untrack(() => {
+        if (route) {
+          console.log('[Router] Rendering route:', route.path);
+          return route.component();
+        } else if (fallback) {
+          console.log('[Router] Rendering fallback');
+          return fallback();
+        } else {
+          console.log('[Router] Rendering 404');
+          return document.createTextNode('404 Not Found');
+        }
+      });
+
+      console.log('[Router] Current node:', currentNode, 'Parent:', marker.parentNode);
+
+      // Insert into DOM
+      if (currentNode && marker.parentNode) {
+        marker.parentNode.insertBefore(currentNode, marker);
+        console.log('[Router] Inserted node into DOM');
+
+        if ((currentNode as any)._dispose) {
+          currentDispose = (currentNode as any)._dispose;
+        }
       } else {
-        return document.createTextNode('404 Not Found');
+        console.log('[Router] Cannot insert - missing node or parent');
       }
+
+      return undefined;
     });
-
-    // Insert into DOM
-    if (currentNode && marker.parentNode) {
-      marker.parentNode.insertBefore(currentNode, marker);
-
-      if ((currentNode as any)._dispose) {
-        currentDispose = (currentNode as any)._dispose;
-      }
-    }
-
-    return undefined;
   });
 
   // Cleanup
   (marker as any)._dispose = () => {
-    dispose();
+    if (effectDispose) {
+      effectDispose();
+    }
     if (currentNode && currentNode.parentNode) {
       currentNode.parentNode.removeChild(currentNode);
     }
