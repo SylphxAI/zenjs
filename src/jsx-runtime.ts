@@ -15,14 +15,15 @@ type Child = Node | string | number | boolean | null | undefined;
 type ReactiveValue = Zen<any> | ComputedZen<any>;
 
 /**
- * Check if value is a reactive signal/computed
+ * Check if value is a reactive signal/computed from @sylphx/zen
+ * Zen signals have _value and _observers properties
  */
 function isReactive(value: any): value is ReactiveValue {
   return (
     value !== null &&
     typeof value === 'object' &&
-    'value' in value &&
-    Object.getOwnPropertyDescriptor(value, 'value') !== undefined
+    '_value' in value &&
+    '_observers' in value
   );
 }
 
