@@ -10,7 +10,7 @@
  */
 
 import { effect, untrack } from '@sylphx/zen';
-import type { Zen as Signal } from '@sylphx/zen';
+import type { AnyZen } from '@sylphx/zen';
 
 interface SwitchProps {
   fallback?: Node | (() => Node);
@@ -18,7 +18,7 @@ interface SwitchProps {
 }
 
 interface MatchProps<T> {
-  when: T | Signal<T> | (() => T);
+  when: T | AnyZen | (() => T);
   children: Node | ((value: T) => Node);
 }
 
@@ -112,6 +112,8 @@ export function Switch(props: SwitchProps): Node {
         currentDispose = (currentNode as any)._dispose;
       }
     }
+
+    return undefined;
   });
 
   // Cleanup

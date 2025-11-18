@@ -10,10 +10,10 @@
  */
 
 import { effect } from '@sylphx/zen';
-import type { Zen as Signal } from '@sylphx/zen';
+import type { AnyZen } from '@sylphx/zen';
 
 interface ForProps<T, U extends Node> {
-  each: T[] | Signal<T[]>;
+  each: T[] | AnyZen;
   children: (item: T, index: () => number) => U;
   fallback?: Node;
 }
@@ -113,6 +113,8 @@ export function For<T, U extends Node>(props: ForProps<T, U>): Node {
 
     // Insert all nodes in correct order
     parent.insertBefore(fragment, marker);
+
+    return undefined;
   });
 
   // Cleanup on dispose

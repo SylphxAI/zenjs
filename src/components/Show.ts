@@ -10,10 +10,10 @@
  */
 
 import { effect, untrack } from '@sylphx/zen';
-import type { Zen as Signal } from '@sylphx/zen';
+import type { AnyZen } from '@sylphx/zen';
 
 interface ShowProps<T> {
-  when: T | Signal<T> | (() => T);
+  when: T | AnyZen | (() => T);
   fallback?: Node | (() => Node);
   children: Node | ((value: T) => Node);
 }
@@ -84,6 +84,8 @@ export function Show<T>(props: ShowProps<T>): Node {
         currentDispose = (currentNode as any)._dispose;
       }
     }
+
+    return undefined;
   });
 
   // Cleanup

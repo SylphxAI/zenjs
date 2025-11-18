@@ -6,13 +6,13 @@
  */
 
 import { effect } from '@sylphx/zen';
-import type { Zen, ComputedZen } from '@sylphx/zen';
+import type { AnyZen } from '@sylphx/zen';
 
 export { Fragment } from './core/fragment.js';
 
 type Props = Record<string, any>;
 type Child = Node | string | number | boolean | null | undefined;
-type ReactiveValue = Zen<any> | ComputedZen<any>;
+type ReactiveValue = AnyZen;
 
 /**
  * Check if value is a reactive signal/computed from @sylphx/zen
@@ -94,6 +94,7 @@ function setAttribute(element: Element, key: string, value: any): void {
 
     effect(() => {
       setStaticAttribute(element, key, value.value);
+      return undefined;
     });
     return;
   }
@@ -154,6 +155,7 @@ function appendChild(parent: Element, child: any): void {
     effect(() => {
       const value = child.value;
       textNode.data = String(value ?? '');
+      return undefined;
     });
     return;
   }
