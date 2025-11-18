@@ -103,9 +103,9 @@ function TodoList() {
       <button onClick={addTodo}>Add</button>
 
       <div class="stats">
-        <span>Total: <strong>{computed(() => stats().total)}</strong></span>
-        <span>Active: <strong>{computed(() => stats().active)}</strong></span>
-        <span>Completed: <strong>{computed(() => stats().completed)}</strong></span>
+        <span>Total: <strong>{computed(() => stats.value.total)}</strong></span>
+        <span>Active: <strong>{computed(() => stats.value.active)}</strong></span>
+        <span>Completed: <strong>{computed(() => stats.value.completed)}</strong></span>
       </div>
 
       <div class="filters">
