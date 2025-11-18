@@ -9,7 +9,7 @@
  * - Navigation with history
  */
 
-import { zen as signal, computed } from '@sylphx/zen';
+import { zen as signal, computed, effect, untrack } from '@sylphx/zen';
 
 // Current route (lazy initialization for SSR/test compatibility)
 export const currentRoute = signal(
@@ -56,33 +56,34 @@ export function Router(props: RouterProps): Node {
   let currentNode: Node | null = null;
   let currentDispose: (() => void) | undefined;
 
-  // Find matching route
-  const matchedRoute = computed(() => {
+  // Effect to update on route change
+  const dispose = effect(() => {
+    // Get current route
     const path = currentRoute.value;
-    return routes.find(r => r.path === path) || null;
-  });
+    const route = routes.find(r => r.path === path) || null;
 
-  // Update on route change
-  const updateRoute = () => {
     // Cleanup previous
     if (currentNode && currentNode.parentNode) {
       currentNode.parentNode.removeChild(currentNode);
+      currentNode = null;
     }
     if (currentDispose) {
       currentDispose();
+      currentDispose = undefined;
     }
 
     // Render new route
-    const route = matchedRoute.value;
-    if (route) {
-      currentNode = route.component();
-    } else if (fallback) {
-      currentNode = fallback();
-    } else {
-      currentNode = document.createTextNode('404 Not Found');
-    }
+    currentNode = untrack(() => {
+      if (route) {
+        return route.component();
+      } else if (fallback) {
+        return fallback();
+      } else {
+        return document.createTextNode('404 Not Found');
+      }
+    });
 
-    // Insert
+    // Insert into DOM
     if (currentNode && marker.parentNode) {
       marker.parentNode.insertBefore(currentNode, marker);
 
@@ -90,24 +91,13 @@ export function Router(props: RouterProps): Node {
         currentDispose = (currentNode as any)._dispose;
       }
     }
-  };
 
-  // Initial render
-  updateRoute();
-
-  // Watch for route changes
-  let lastRoute = matchedRoute.value;
-  const checkRoute = () => {
-    if (matchedRoute.value !== lastRoute) {
-      lastRoute = matchedRoute.value;
-      updateRoute();
-    }
-    requestAnimationFrame(checkRoute);
-  };
-  requestAnimationFrame(checkRoute);
+    return undefined;
+  });
 
   // Cleanup
   (marker as any)._dispose = () => {
+    dispose();
     if (currentNode && currentNode.parentNode) {
       currentNode.parentNode.removeChild(currentNode);
     }
