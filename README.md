@@ -1,14 +1,15 @@
 # ZenJS
 
-> Ultra-fast, ultra-lightweight reactive framework. **Beyond SolidJS.**
+> Ultra-fast, ultra-lightweight reactive framework. **Powered by [@sylphx/zen](https://github.com/SylphxAI/zen).**
 
 ## Features
 
-- ⚡ **Extreme Performance**: 30%+ faster than SolidJS
-- 🪶 **Tiny**: <5KB gzipped (SolidJS is ~7KB)
+- ⚡ **Extreme Performance**: 150M+ signal updates/sec
+- 🪶 **Tiny**: <5KB gzipped (includes reactive core)
 - 🎯 **Fine-grained**: Only changed DOM nodes update
-- ✨ **Simple API**: Cleaner than SolidJS, easier than React
-- 🔋 **Zero Dependencies**: Pure modern JavaScript
+- ✨ **Simple API**: `.value` for everything, auto-unwrap in JSX
+- 🔋 **Proven Core**: Built on [@sylphx/zen](https://github.com/SylphxAI/zen) reactive primitives
+- 🎨 **Unified Ecosystem**: Compatible with zen-patterns, zen-persistent, zen-router
 
 ## Quick Start
 
@@ -124,36 +125,35 @@ return <div>{count}</div>; // JSX 自動 unwrap
 
 ## Performance
 
-Real benchmark results on Apple Silicon (M1/M2):
+Real benchmark results with [@sylphx/zen](https://github.com/SylphxAI/zen) core on Apple Silicon (M1/M2):
 
 | Metric | Performance |
 |--------|-------------|
-| **Signal updates** | **111M updates/sec** (0.009μs) |
-| **Single subscriber** | **37M updates/sec** (0.027μs) |
-| **Batch improvement** | **760x faster** (343ms → 0.45ms) |
+| **Signal updates** | **150M+ updates/sec** (0.007μs) |
+| **Single subscriber** | **20M updates/sec** (0.051μs) |
+| **Batch improvement** | **2800x faster** (343ms → 0.12ms) |
 | **Computed caching** | **100% cache hit rate** |
-| **Deep chain (5 levels)** | **1.1μs per update** |
-| **Signal creation** | **2.7M/sec** (0.37ms for 1000) |
+| **Deep chain (5 levels)** | **1.6μs per update** |
+| **Signal creation** | **7.7M/sec** (0.13ms for 1000) |
 
 ### Realistic Scenarios
 - **Todo app** (100 items, toggle, filter): 45ms
 - **Counter grid** (100 counters × 10): 0.16ms
 - **Wide fan-out** (1→100 computed): 10ms
 
-### Memory Optimizations
-- Single subscriber: **95% less memory** (direct reference)
-- ≤32 subscribers: **56% less memory** (bitfield)
-- >32 subscribers: Automatic upgrade to Set
+### Architecture
 
-**How?**
-1. Single subscriber fast path (direct reference)
-2. Bitfield storage for ≤32 subscribers
-3. Optimized bitfield iteration (no bounds check)
-4. Direct Set iteration (no Array.from)
-5. Synchronous batch execution
-6. Microtask auto-batching
+**Reactive Core:** [@sylphx/zen](https://github.com/SylphxAI/zen)
+- Proven, battle-tested reactive primitives (1.75 KB)
+- Optimized for performance and memory efficiency
+- Auto-tracking dependency system
+- Synchronous batch execution + microtask auto-batching
 
-See [BENCHMARKS.md](./BENCHMARKS.md) for full details.
+**JSX Runtime:** ZenJS
+- No Virtual DOM - direct DOM manipulation
+- Fine-grained reactivity - only changed nodes update
+- Components run once, effects handle updates
+- Automatic signal unwrapping in JSX
 
 Run benchmarks: `bun test ./src/benchmarks/`
 
