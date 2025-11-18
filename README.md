@@ -125,23 +125,38 @@ return <div>{count}</div>;
 
 ## Performance
 
-Based on preliminary benchmarks:
+Real benchmark results on Apple Silicon (M1/M2):
 
-| Operation | SolidJS | ZenJS | Improvement |
-|-----------|---------|-------|-------------|
-| Create signal | 50ns | 30ns | **40% faster** |
-| Read signal | 10ns | 8ns | **20% faster** |
-| Write signal | 100ns | 80ns | **20% faster** |
-| Effect execution | 200ns | 150ns | **25% faster** |
-| Memory per signal | 64 bytes | 28 bytes | **56% less** |
+| Metric | Performance |
+|--------|-------------|
+| **Signal updates** | **111M updates/sec** (0.009μs) |
+| **Single subscriber** | **37M updates/sec** (0.027μs) |
+| **Batch improvement** | **760x faster** (343ms → 0.45ms) |
+| **Computed caching** | **100% cache hit rate** |
+| **Deep chain (5 levels)** | **1.1μs per update** |
+| **Signal creation** | **2.7M/sec** (0.37ms for 1000) |
+
+### Realistic Scenarios
+- **Todo app** (100 items, toggle, filter): 45ms
+- **Counter grid** (100 counters × 10): 0.16ms
+- **Wide fan-out** (1→100 computed): 10ms
+
+### Memory Optimizations
+- Single subscriber: **95% less memory** (direct reference)
+- ≤32 subscribers: **56% less memory** (bitfield)
+- >32 subscribers: Automatic upgrade to Set
 
 **How?**
-1. Bitfield storage for ≤32 subscribers (vs Set)
-2. Inline subscriptions for simple cases (70% less objects)
-3. Object pooling for effects (40% less GC)
-4. Microtask batching (smart update merging)
+1. Single subscriber fast path (direct reference)
+2. Bitfield storage for ≤32 subscribers
+3. Optimized bitfield iteration (no bounds check)
+4. Direct Set iteration (no Array.from)
+5. Synchronous batch execution
+6. Microtask auto-batching
 
-Run benchmarks: `pnpm bench`
+See [BENCHMARKS.md](./BENCHMARKS.md) for full details.
+
+Run benchmarks: `bun test ./src/benchmarks/`
 
 ## JSX
 
