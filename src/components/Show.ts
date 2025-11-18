@@ -9,8 +9,8 @@
  * - Supports fallback
  */
 
-import { effect, untrack } from '../core/effect.js';
-import type { Signal } from '../core/signal.js';
+import { effect, untrack } from '@sylphx/zen';
+import type { Zen as Signal } from '@sylphx/zen';
 
 interface ShowProps<T> {
   when: T | Signal<T> | (() => T);

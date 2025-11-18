@@ -9,8 +9,8 @@
  * - Memory efficient (reuses nodes)
  */
 
-import { effect } from '../core/effect.js';
-import type { Signal } from '../core/signal.js';
+import { effect } from '@sylphx/zen';
+import type { Zen as Signal } from '@sylphx/zen';
 
 interface ForProps<T, U extends Node> {
   each: T[] | Signal<T[]>;
