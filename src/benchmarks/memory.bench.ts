@@ -41,7 +41,7 @@ test('Signal memory - bitfield vs Set structure', () => {
   const effects1: any[] = [];
 
   for (let i = 0; i < 30; i++) {
-    effects1.push(effect(() => sig1()));
+    effects1.push(effect(() => sig1.value));
   }
 
   const subs1 = (sig1 as any)._subscribers;
@@ -57,7 +57,7 @@ test('Signal memory - bitfield vs Set structure', () => {
   const effects2: any[] = [];
 
   for (let i = 0; i < 40; i++) {
-    effects2.push(effect(() => sig2()));
+    effects2.push(effect(() => sig2.value));
   }
 
   const subs2 = (sig2 as any)._subscribers;
@@ -96,7 +96,7 @@ test('Computed overhead', () => {
   const start = performance.now();
   const computeds = [];
   for (let i = 0; i < count; i++) {
-    computeds.push(computed(() => base() * 2));
+    computeds.push(computed(() => base.value * 2));
   }
   const end = performance.now();
 

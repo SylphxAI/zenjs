@@ -66,8 +66,8 @@ function setAttribute(element: Element, key: string, value: any): void {
     return;
   }
 
-  // Reactive value
-  if (typeof value === 'function' && '_version' in value) {
+  // Reactive value (Signal or Computed)
+  if (typeof value === 'object' && value !== null && '_version' in value) {
     const signal = value as Signal;
 
     // Special handling for form control values - don't use effect
@@ -75,12 +75,12 @@ function setAttribute(element: Element, key: string, value: any): void {
     if (key === 'value' && (element instanceof HTMLInputElement ||
                              element instanceof HTMLTextAreaElement ||
                              element instanceof HTMLSelectElement)) {
-      (element as any)[key] = signal();
+      (element as any)[key] = signal.value;
       return;
     }
 
     effect(() => {
-      setStaticAttribute(element, key, signal());
+      setStaticAttribute(element, key, signal.value);
     });
     return;
   }
@@ -133,14 +133,14 @@ function appendChild(parent: Element, child: any): void {
     return;
   }
 
-  // Reactive child
-  if (typeof child === 'function' && '_version' in child) {
+  // Reactive child (Signal or Computed)
+  if (typeof child === 'object' && child !== null && '_version' in child) {
     const signal = child as Signal;
     const textNode = document.createTextNode('');
     parent.appendChild(textNode);
 
     effect(() => {
-      const value = signal();
+      const value = signal.value;
       textNode.data = String(value ?? '');
     });
     return;

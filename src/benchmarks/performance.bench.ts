@@ -30,7 +30,7 @@ test('Effect execution performance', async () => {
   let runCount = 0;
 
   effect(() => {
-    sig();
+    sig.value;
     runCount++;
   });
 
@@ -62,7 +62,7 @@ test('Batch performance benefit', async () => {
 
   // Test without batch - force microtask flush between updates
   effect(() => {
-    a(); b(); c();
+    a.value; b.value; c.value;
     normalRuns++;
   });
 
@@ -86,7 +86,7 @@ test('Batch performance benefit', async () => {
   const c2 = signal(0);
 
   effect(() => {
-    a2(); b2(); c2();
+    a2.value; b2.value; c2.value;
     batchedRuns++;
   });
 
@@ -119,7 +119,7 @@ test('Computed caching effectiveness', () => {
 
   const doubled = computed(() => {
     computeCount++;
-    return base() * 2;
+    return base.value * 2;
   });
 
   // Read multiple times without changing base
@@ -127,7 +127,7 @@ test('Computed caching effectiveness', () => {
   const start = performance.now();
 
   for (let i = 0; i < iterations; i++) {
-    doubled();
+    doubled.value;
   }
 
   const end = performance.now();
@@ -146,7 +146,7 @@ test('Single subscriber fast path', () => {
   let runCount = 0;
 
   effect(() => {
-    sig();
+    sig.value;
     runCount++;
   });
 
@@ -176,7 +176,7 @@ test('Many subscribers performance', async () => {
   for (let i = 0; i < effectCount; i++) {
     runCounts[i] = 0;
     effect(() => {
-      sig();
+      sig.value;
       runCounts[i]++;
     });
   }

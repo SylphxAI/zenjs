@@ -51,7 +51,6 @@ import { signal } from 'zenjs';
 const count = signal(0);
 
 // Read
-console.log(count()); // 0
 console.log(count.value); // 0
 
 // Write
@@ -69,7 +68,7 @@ import { effect } from 'zenjs';
 const count = signal(0);
 
 effect(() => {
-  console.log('Count is:', count());
+  console.log('Count is:', count.value);
 });
 
 count.value = 1; // Logs: "Count is: 1"
@@ -83,12 +82,12 @@ Derived state that auto-updates:
 import { computed } from 'zenjs';
 
 const count = signal(0);
-const doubled = computed(() => count() * 2);
+const doubled = computed(() => count.value * 2);
 
-console.log(doubled()); // 0
+console.log(doubled.value); // 0
 
 count.value = 5;
-console.log(doubled()); // 10
+console.log(doubled.value); // 10
 ```
 
 ## API Comparison
@@ -106,22 +105,22 @@ createEffect(() => {
 
 return <div>{count()}</div>;
 
-// ZenJS
+// ZenJS - 全部用 .value (Vue 3 / Preact 風格)
 const count = signal(0);
-const doubled = computed(() => count() * 2);
+const doubled = computed(() => count.value * 2);
 
 effect(() => {
-  console.log(count());
+  console.log(count.value);
 });
 
-return <div>{count}</div>;
+return <div>{count}</div>; // JSX 自動 unwrap
 ```
 
 **Differences**:
 - ✅ Single signal() call instead of destructuring
-- ✅ Automatic unwrapping in JSX (no `()` needed)
-- ✅ .value for writes (clearer intent)
-- ✅ Simpler API names
+- ✅ Consistent .value API (read and write)
+- ✅ Automatic unwrapping in JSX (no `.value` needed)
+- ✅ Simpler and more consistent
 
 ## Performance
 
@@ -230,8 +229,8 @@ const a = signal(1);
 const b = signal(2);
 
 effect(() => {
-  console.log(a()); // Tracked
-  console.log(untrack(() => b())); // Not tracked
+  console.log(a.value); // Tracked
+  console.log(untrack(() => b.value)); // Not tracked
 });
 
 b.value = 3; // Effect won't run
@@ -267,7 +266,7 @@ const text = document.createTextNode('');
 div.appendChild(text);
 
 effect(() => {
-  text.data = String(count());
+  text.data = String(count.value);
 });
 ```
 
@@ -284,7 +283,7 @@ function App() {
   console.log('Setup'); // Runs once
 
   effect(() => {
-    console.log('Count:', count()); // Runs on every change
+    console.log('Count:', count.value); // Runs on every change
   });
 
   return <div>{count}</div>;

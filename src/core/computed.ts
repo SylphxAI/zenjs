@@ -8,6 +8,7 @@
  * - Caches result until dependencies change
  * - Automatically tracks dependencies
  * - Can be subscribed like a Signal
+ * - Uses .value API for consistency
  */
 
 import { currentEffect, setCurrentEffect, type Effect } from './effect.js';
@@ -16,8 +17,7 @@ import { scheduleUpdate } from './scheduler.js';
 const UNSET = Symbol('unset');
 
 export interface Computed<T> {
-  (): T;
-  value: T;
+  readonly value: T;
   peek(): T;
   _subscribers?: Set<Effect> | Effect[];
   _bitfield?: number;
@@ -55,8 +55,6 @@ export function computed<T>(fn: () => T): Computed<T> {
     computedEffect.dependencies.clear();
 
     // Track dependencies while computing
-    // We need to temporarily set this computed as the current effect
-    // so signals know to add it as a subscriber
     const prevEffect = currentEffect;
     setCurrentEffect(computedEffect);
 
@@ -70,30 +68,29 @@ export function computed<T>(fn: () => T): Computed<T> {
     }
   };
 
-  const read = (() => {
-    // Track this computed as a dependency
-    const effect = currentEffect;
-    if (effect) {
-      addSubscriber(effect);
-    }
+  const comp = {} as Computed<T>;
 
-    // Compute if dirty or unset
-    if (dirty || cache === UNSET) {
-      return compute();
-    }
-
-    return cache as T;
-  }) as Computed<T>;
-
-  // Getter for .value access
-  Object.defineProperty(read, 'value', {
+  // .value getter (read-only)
+  Object.defineProperty(comp, 'value', {
     get() {
-      return read();
+      // Track this computed as a dependency
+      const effect = currentEffect;
+      if (effect) {
+        addSubscriber(effect);
+        effect.dependencies.add(comp);
+      }
+
+      // Compute if dirty or unset
+      if (dirty || cache === UNSET) {
+        return compute();
+      }
+
+      return cache as T;
     },
   });
 
   // Peek without tracking
-  read.peek = () => {
+  comp.peek = () => {
     if (dirty || cache === UNSET) {
       return compute();
     }
@@ -101,15 +98,15 @@ export function computed<T>(fn: () => T): Computed<T> {
   };
 
   // Expose internal state as getters
-  Object.defineProperty(read, '_subscribers', {
+  Object.defineProperty(comp, '_subscribers', {
     get() { return subscribers; },
   });
 
-  Object.defineProperty(read, '_bitfield', {
+  Object.defineProperty(comp, '_bitfield', {
     get() { return bitfield; },
   });
 
-  Object.defineProperty(read, '_version', {
+  Object.defineProperty(comp, '_version', {
     get() { return 0; }, // Mark as signal-like for JSX runtime
   });
 
@@ -167,5 +164,5 @@ export function computed<T>(fn: () => T): Computed<T> {
     }
   }
 
-  return read;
+  return comp;
 }

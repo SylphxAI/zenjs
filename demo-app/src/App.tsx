@@ -8,8 +8,8 @@ import { FineGrainedDemo, BatchDemo, MemoryDemo } from './Showcase';
 // ========== Counter Component ==========
 function Counter() {
   const count = signal(0);
-  const doubled = computed(() => count() * 2);
-  const squared = computed(() => count() * count());
+  const doubled = computed(() => count.value * 2);
+  const squared = computed(() => count.value * count.value);
 
   return (
     <div class="demo-card">
@@ -52,8 +52,8 @@ function TodoList() {
   let inputRef: HTMLInputElement;
 
   const filteredTodos = computed(() => {
-    const list = todos();
-    const f = filter();
+    const list = todos.value;
+    const f = filter.value;
 
     if (f === 'active') return list.filter(t => !t.completed);
     if (f === 'completed') return list.filter(t => t.completed);
@@ -61,7 +61,7 @@ function TodoList() {
   });
 
   const stats = computed(() => {
-    const list = todos();
+    const list = todos.value;
     return {
       total: list.length,
       active: list.filter(t => !t.completed).length,
@@ -74,20 +74,20 @@ function TodoList() {
     if (!text) return;
 
     todos.value = [
-      ...todos(),
+      ...todos.value,
       { id: Date.now(), text, completed: false }
     ];
     if (inputRef) inputRef.value = '';
   };
 
   const toggleTodo = (id: number) => {
-    todos.value = todos().map(t =>
+    todos.value = todos.value.map(t =>
       t.id === id ? { ...t, completed: !t.completed } : t
     );
   };
 
   const removeTodo = (id: number) => {
-    todos.value = todos().filter(t => t.id !== id);
+    todos.value = todos.value.filter(t => t.id !== id);
   };
 
   return (
@@ -110,19 +110,19 @@ function TodoList() {
 
       <div class="filters">
         <button
-          class={computed(() => filter() === 'all' ? 'active' : '')}
+          class={computed(() => filter.value === 'all' ? 'active' : '')}
           onClick={() => filter.value = 'all'}
         >
           All
         </button>
         <button
-          class={computed(() => filter() === 'active' ? 'active' : '')}
+          class={computed(() => filter.value === 'active' ? 'active' : '')}
           onClick={() => filter.value = 'active'}
         >
           Active
         </button>
         <button
-          class={computed(() => filter() === 'completed' ? 'active' : '')}
+          class={computed(() => filter.value === 'completed' ? 'active' : '')}
           onClick={() => filter.value = 'completed'}
         >
           Completed
@@ -130,7 +130,7 @@ function TodoList() {
       </div>
 
       <Show
-        when={computed(() => filteredTodos().length > 0)}
+        when={computed(() => filteredTodos.value.length > 0)}
         fallback={<p style="color: #999; text-align: center;">No todos yet!</p>}
       >
         <ul class="todo-list">
@@ -184,7 +184,7 @@ function Conditional() {
       <h2>🔀 Conditional - Show & Switch</h2>
 
       <h3>Show Component:</h3>
-      <button onClick={() => isLoggedIn.value = !isLoggedIn()}>
+      <button onClick={() => isLoggedIn.value = !isLoggedIn.value}>
         Toggle Login
       </button>
 
@@ -209,19 +209,19 @@ function Conditional() {
       </div>
 
       <Switch fallback={<div>Not Found</div>}>
-        <Match when={() => view() === 'home'}>
+        <Match when={() => view.value === 'home'}>
           <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">
             <h3>🏠 Home</h3>
             <p>Welcome to the home page!</p>
           </div>
         </Match>
-        <Match when={() => view() === 'profile'}>
+        <Match when={() => view.value === 'profile'}>
           <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">
             <h3>👤 Profile</h3>
             <p>Your profile information</p>
           </div>
         </Match>
-        <Match when={() => view() === 'settings'}>
+        <Match when={() => view.value === 'settings'}>
           <div style="padding: 12px; background: #f5f5f5; border-radius: 6px;">
             <h3>⚙️ Settings</h3>
             <p>App settings and preferences</p>

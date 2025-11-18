@@ -17,21 +17,21 @@ test('Todo app scenario - add/toggle/filter', async () => {
   const filter = signal<'all' | 'active' | 'completed'>('all');
 
   const filteredTodos = computed(() => {
-    const list = todos();
-    const f = filter();
+    const list = todos.value;
+    const f = filter.value;
     if (f === 'all') return list;
     if (f === 'active') return list.filter(t => !t.completed);
     return list.filter(t => t.completed);
   });
 
-  const activeCount = computed(() => todos().filter(t => !t.completed).length);
-  const completedCount = computed(() => todos().filter(t => t.completed).length);
+  const activeCount = computed(() => todos.value.filter(t => !t.completed).length);
+  const completedCount = computed(() => todos.value.filter(t => t.completed).length);
 
   let renderCount = 0;
   effect(() => {
-    filteredTodos();
-    activeCount();
-    completedCount();
+    filteredTodos.value;
+    activeCount.value;
+    completedCount.value;
     renderCount++;
   });
 
@@ -40,7 +40,7 @@ test('Todo app scenario - add/toggle/filter', async () => {
   // Add 100 todos
   for (let i = 0; i < 100; i++) {
     batch(() => {
-      todos.value = [...todos(), { id: i, text: `Todo ${i}`, completed: false }];
+      todos.value = [...todos.value, { id: i, text: `Todo ${i}`, completed: false }];
     });
   }
 
@@ -49,7 +49,7 @@ test('Todo app scenario - add/toggle/filter', async () => {
   // Toggle some todos
   for (let i = 0; i < 50; i++) {
     batch(() => {
-      const list = todos();
+      const list = todos.value;
       list[i].completed = true;
       todos.value = [...list];
     });
@@ -68,10 +68,10 @@ test('Todo app scenario - add/toggle/filter', async () => {
 
   console.log(`Todo app scenario: ${(end - start).toFixed(2)}ms`);
   console.log(`Render count: ${renderCount}`);
-  console.log(`Final state: ${activeCount()} active, ${completedCount()} completed`);
+  console.log(`Final state: ${activeCount.value} active, ${completedCount.value} completed`);
 
-  expect(activeCount()).toBe(50);
-  expect(completedCount()).toBe(50);
+  expect(activeCount.value).toBe(50);
+  expect(completedCount.value).toBe(50);
 });
 
 test('Counter grid scenario - 10x10 independent counters', () => {
@@ -80,7 +80,7 @@ test('Counter grid scenario - 10x10 independent counters', () => {
   // Create 100 counters
   for (let i = 0; i < 100; i++) {
     const count = signal(0);
-    const doubled = computed(() => count() * 2);
+    const doubled = computed(() => count.value * 2);
     counters.push({ count, doubled });
   }
 
@@ -100,21 +100,21 @@ test('Counter grid scenario - 10x10 independent counters', () => {
   console.log(`Time per update: ${((end - start) / 1000).toFixed(3)}ms`);
 
   // Verify all counters are at 10
-  expect(counters.every(c => c.count() === 10)).toBe(true);
-  expect(counters.every(c => c.doubled() === 20)).toBe(true);
+  expect(counters.every(c => c.count.value === 10)).toBe(true);
+  expect(counters.every(c => c.doubled.value === 20)).toBe(true);
 });
 
 test('Deep computed chain scenario', async () => {
   const base = signal(1);
-  const step1 = computed(() => base() * 2);
-  const step2 = computed(() => step1() + 10);
-  const step3 = computed(() => step2() * 3);
-  const step4 = computed(() => step3() - 5);
-  const step5 = computed(() => step4() / 2);
+  const step1 = computed(() => base.value * 2);
+  const step2 = computed(() => step1.value + 10);
+  const step3 = computed(() => step2.value * 3);
+  const step4 = computed(() => step3.value - 5);
+  const step5 = computed(() => step4.value / 2);
 
   let finalValue = 0;
   effect(() => {
-    finalValue = step5();
+    finalValue = step5.value;
   });
 
   const start = performance.now();
@@ -142,12 +142,12 @@ test('Wide fan-out scenario - 1 signal, 100 computed', async () => {
   const computeds = [];
 
   for (let i = 0; i < 100; i++) {
-    computeds.push(computed(() => source() + i));
+    computeds.push(computed(() => source.value + i));
   }
 
   let renderCount = 0;
   effect(() => {
-    computeds.forEach(c => c());
+    computeds.forEach(c => c.value);
     renderCount++;
   });
 
@@ -173,11 +173,11 @@ test('Batch vs non-batch realistic scenario', async () => {
   const a1 = signal(0);
   const b1 = signal(0);
   const c1 = signal(0);
-  const sum1 = computed(() => a1() + b1() + c1());
+  const sum1 = computed(() => a1.value + b1.value + c1.value);
 
   let runs1 = 0;
   effect(() => {
-    sum1();
+    sum1.value;
     runs1++;
   });
 
@@ -197,11 +197,11 @@ test('Batch vs non-batch realistic scenario', async () => {
   const a2 = signal(0);
   const b2 = signal(0);
   const c2 = signal(0);
-  const sum2 = computed(() => a2() + b2() + c2());
+  const sum2 = computed(() => a2.value + b2.value + c2.value);
 
   let runs2 = 0;
   effect(() => {
-    sum2();
+    sum2.value;
     runs2++;
   });
 

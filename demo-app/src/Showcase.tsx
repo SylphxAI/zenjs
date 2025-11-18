@@ -9,7 +9,7 @@ export function FineGrainedDemo() {
   const count1 = signal(0);
   const count2 = signal(0);
   const count3 = signal(0);
-  const totalClicks = computed(() => count1() + count2() + count3());
+  const totalClicks = computed(() => count1.value + count2.value + count3.value);
 
   return (
     <div class="demo-card" style="border: 2px solid #00d4ff;">
@@ -75,7 +75,7 @@ export function FineGrainedDemo() {
 // ========== Batch Performance Demo ==========
 export function BatchDemo() {
   const count = signal(0);
-  const sum = computed(() => count() * 3);
+  const sum = computed(() => count.value * 3);
 
   return (
     <div class="demo-card" style="border: 2px solid #ff6b6b;">
