@@ -132,26 +132,34 @@ batch(() => {
 // Immediately runs flushSync() - no microtask wait
 ```
 
-## 性能對比 (Performance Comparison)
+## ZenJS 性能數據 (ZenJS Performance Only)
 
-### vs SolidJS (Estimated)
-| Metric | SolidJS | ZenJS | Improvement |
-|--------|---------|-------|-------------|
-| Signal updates | ~80M/sec | 111M/sec | **+39%** |
-| Memory (32 subs) | Set (~120B) | Bitfield (~52B) | **-56%** |
-| Batch | Microtask | Synchronous | **760x faster** |
-| Bundle size | ~7KB | <5KB | **-29%** |
+**重要**: 以下數據只係 ZenJS 自己嘅測試結果，**未有實際對比其他框架**。
 
-**結論**: ZenJS 在所有關鍵指標上都超越 SolidJS
+### 實測數據
+| Metric | ZenJS Performance |
+|--------|-------------------|
+| Signal updates | 111M/sec (0.009μs) |
+| Single subscriber | 37M/sec (0.027μs) |
+| Batch performance | 760x improvement (343ms → 0.45ms) |
+| Memory (single sub) | Direct reference (~8 bytes) |
+| Memory (≤32 subs) | Bitfield + Array (~256 bytes) |
+| Memory (>32 subs) | Set (auto-upgrade) |
+| Bundle size | ~5KB (estimated) |
 
-### vs React
-| Metric | React | ZenJS | Improvement |
-|--------|-------|-------|-------------|
-| Update mechanism | Virtual DOM | Direct DOM | **10-100x faster** |
-| Re-renders | Full component | Changed nodes only | **~100x less** |
-| Bundle size | ~40KB | <5KB | **-87%** |
+### 技術差異 (Technical Differences)
 
-**結論**: ZenJS 比 React 快 10-100 倍
+**vs SolidJS (理論差異，未實測)**:
+- 單訂閱者: ZenJS 用直接引用，SolidJS 用 Set
+- ≤32 訂閱者: ZenJS 用 bitfield，SolidJS 用 Set
+- Batch: ZenJS 同步執行，SolidJS 微任務
+
+**vs React (架構差異，未實測)**:
+- 更新機制: ZenJS 直接 DOM，React 用 Virtual DOM
+- 更新粒度: ZenJS 節點級，React 組件級
+- 重渲染: ZenJS 組件只執行一次，React 每次更新都重渲染
+
+**需要真實對比，必須建立 side-by-side benchmark。**
 
 ## 框架特性 (Framework Features)
 

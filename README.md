@@ -320,20 +320,20 @@ function App() {
 
 ## Why ZenJS?
 
-### vs React
-- ⚡ 10x faster (no vDOM, fine-grained updates)
-- 🪶 5x smaller bundle
-- ✨ Simpler API (no hooks rules, no memo hell)
+### 技術特點 (Technical Features)
+- ⚡ **極致性能**: 111M signal updates/sec
+- 🪶 **超輕量**: <5KB gzipped
+- 🎯 **Fine-grained**: 只更新變化的 DOM 節點
+- ✨ **簡潔 API**: 單一 signal() 調用，自動 unwrap
+- 🧠 **智能優化**: 單訂閱者、bitfield、自動 batch
 
-### vs SolidJS
-- ⚡ 30% faster (bitfield storage, inline subscriptions)
-- 🪶 Smaller bundle (<5KB vs ~7KB)
-- ✨ Cleaner API (no destructuring, auto-unwrap in JSX)
+### 架構優勢 (Architecture)
+- **零 Virtual DOM**: 直接操作真實 DOM
+- **組件只執行一次**: 之後全靠 Signal 自動更新
+- **自動依賴追蹤**: Effect 自動追蹤 Signal 讀取
+- **100% 緩存命中**: Computed 完美緩存策略
 
-### vs Vue
-- 🎯 More explicit (signals vs magic reactivity)
-- 🪶 Smaller bundle (no template compiler in runtime)
-- ⚡ Faster (fine-grained vs component-level)
+**注意**: 未有實際對比其他框架的 benchmark。以上數據為 ZenJS 獨立測試結果。
 
 ## Contributing
 
