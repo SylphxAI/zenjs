@@ -54,6 +54,6 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@sylphx/zen": "^3.48.0"
+    "@sylphx/zen": "^3.49.2"
   }
 }
