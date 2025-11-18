@@ -1,91 +1,6 @@
+import { AnyZen } from '@sylphx/zen';
+export { ComputedZen as Computed, Zen as Signal, batch, computed, effect, peek, zen as signal, subscribe, untrack } from '@sylphx/zen';
 export { Fragment, render } from './jsx-runtime.js';
-
-/**
- * ZenJS Core - Effect Implementation
- *
- * Tracks dependencies and re-runs when they change
- */
-interface Effect {
-    fn: () => void;
-    dependencies: Set<any>;
-    cleanup?: () => void;
-    _isRunning: boolean;
-    _disposed: boolean;
-}
-/**
- * Create an effect that runs when dependencies change
- */
-declare function effect(fn: () => void | (() => void)): () => void;
-/**
- * Run a function without tracking dependencies
- */
-declare function untrack<T>(fn: () => T): T;
-
-/**
- * ZenJS Core - Signal Implementation
- *
- * Optimizations over SolidJS:
- * 1. Bitfield storage for ≤32 subscribers (60% memory reduction)
- * 2. Inline subscriptions for simple cases (70% less objects)
- * 3. Object pooling for Effects (40% less GC)
- */
-
-interface Signal<T = any> {
-    (): T;
-    value: T;
-    peek(): T;
-    _subscribers?: Set<Effect> | Effect[];
-    _bitfield?: number;
-    _version: number;
-}
-/**
- * Create a reactive signal
- */
-declare function signal<T>(initialValue: T): Signal<T>;
-/**
- * Batch multiple signal updates
- * Defers effect execution until the batch completes
- */
-declare function batch<T>(fn: () => T): T;
-/**
- * Check if currently batching
- */
-declare function isBatching(): boolean;
-
-/**
- * ZenJS Core - Computed Implementation
- *
- * Lazy-evaluated derived state with automatic caching
- *
- * Key features:
- * - Only computes when read (lazy)
- * - Caches result until dependencies change
- * - Automatically tracks dependencies
- * - Can be subscribed like a Signal
- */
-
-interface Computed<T> {
-    (): T;
-    value: T;
-    peek(): T;
-    _subscribers?: Set<Effect> | Effect[];
-    _bitfield?: number;
-}
-/**
- * Create a computed value that auto-tracks dependencies
- */
-declare function computed<T>(fn: () => T): Computed<T>;
-
-/**
- * ZenJS Core - Scheduler Implementation
- *
- * Batches updates in microtask for optimal performance
- */
-
-/**
- * Synchronously flush all pending updates
- */
-declare function flushSync(): void;
 
 /**
  * ZenJS For Component
@@ -99,7 +14,7 @@ declare function flushSync(): void;
  */
 
 interface ForProps<T, U extends Node> {
-    each: T[] | Signal<T[]>;
+    each: T[] | AnyZen;
     children: (item: T, index: () => number) => U;
     fallback?: Node;
 }
@@ -125,7 +40,7 @@ declare function For<T, U extends Node>(props: ForProps<T, U>): Node;
  */
 
 interface ShowProps<T> {
-    when: T | Signal<T> | (() => T);
+    when: T | AnyZen | (() => T);
     fallback?: Node | (() => Node);
     children: Node | ((value: T) => Node);
 }
@@ -160,7 +75,7 @@ interface SwitchProps {
     children: Node[];
 }
 interface MatchProps<T> {
-    when: T | Signal<T> | (() => T);
+    when: T | AnyZen | (() => T);
     children: Node | ((value: T) => Node);
 }
 /**
@@ -183,4 +98,97 @@ declare function Match<T>(props: MatchProps<T>): Node;
  */
 declare function Switch(props: SwitchProps): Node;
 
-export { type Computed, type Effect, For, Match, Show, type Signal, Switch, batch, computed, effect, flushSync, isBatching, signal, untrack };
+/**
+ * ZenJS Portal Component
+ *
+ * Render children into a different part of the DOM tree
+ *
+ * Features:
+ * - Render outside parent hierarchy
+ * - Useful for modals, tooltips, popovers
+ * - Maintains reactive context
+ */
+interface PortalProps {
+    mount?: Element;
+    children: Node;
+}
+/**
+ * Portal component - Render children into different DOM location
+ *
+ * @example
+ * <Portal mount={document.body}>
+ *   <Modal>...</Modal>
+ * </Portal>
+ */
+declare function Portal(props: PortalProps): Node;
+
+/**
+ * ZenJS ErrorBoundary Component
+ *
+ * Catch and handle errors in component tree
+ *
+ * Features:
+ * - Catch render errors
+ * - Display fallback UI
+ * - Error recovery
+ */
+interface ErrorBoundaryProps {
+    fallback: (error: Error, reset: () => void) => Node;
+    children: Node | (() => Node);
+}
+/**
+ * ErrorBoundary component - Catch errors in component tree
+ *
+ * @example
+ * <ErrorBoundary fallback={(error, reset) => (
+ *   <div>
+ *     <h1>Error: {error.message}</h1>
+ *     <button onClick={reset}>Retry</button>
+ *   </div>
+ * )}>
+ *   <App />
+ * </ErrorBoundary>
+ */
+declare function ErrorBoundary(props: ErrorBoundaryProps): Node;
+
+/**
+ * ZenJS Simple Router
+ *
+ * Client-side routing without page reload
+ *
+ * Features:
+ * - Hash-based routing
+ * - Reactive route matching
+ * - Navigation with history
+ */
+declare const currentRoute: any;
+declare function navigate(path: string): void;
+interface RouteProps {
+    path: string;
+    component: () => Node;
+}
+interface RouterProps {
+    routes: RouteProps[];
+    fallback?: () => Node;
+}
+/**
+ * Router component - Client-side routing
+ *
+ * @example
+ * <Router routes={[
+ *   { path: '/', component: () => <Home /> },
+ *   { path: '/about', component: () => <About /> },
+ * ]} />
+ */
+declare function Router(props: RouterProps): Node;
+/**
+ * Link component - Navigation link
+ */
+interface LinkProps {
+    href: string;
+    children: Node | string;
+    class?: string;
+}
+declare function Link(props: LinkProps): Node;
+
+export { ErrorBoundary, For, Link, Match, Portal, Router, Show, Switch, currentRoute, navigate };

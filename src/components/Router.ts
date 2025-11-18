@@ -11,18 +11,24 @@
 
 import { zen as signal, computed } from '@sylphx/zen';
 
-// Current route
-export const currentRoute = signal(window.location.hash.slice(1) || '/');
+// Current route (lazy initialization for SSR/test compatibility)
+export const currentRoute = signal(
+  typeof window !== 'undefined' ? window.location.hash.slice(1) || '/' : '/'
+);
 
 // Navigate to route
 export function navigate(path: string) {
-  window.location.hash = path;
+  if (typeof window !== 'undefined') {
+    window.location.hash = path;
+  }
 }
 
-// Listen to hash changes
-window.addEventListener('hashchange', () => {
-  currentRoute.value = window.location.hash.slice(1) || '/';
-});
+// Listen to hash changes (browser only)
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', () => {
+    currentRoute.value = window.location.hash.slice(1) || '/';
+  });
+}
 
 interface RouteProps {
   path: string;
