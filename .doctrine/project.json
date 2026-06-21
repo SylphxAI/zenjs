@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "repo": "SylphxAI/zenjs",
+    "name": "ZenJS",
+    "lifecycle": "active",
+    "layer": "foundation",
+    "summary": "Foundation reactive UI framework package powered by @sylphx/zen with runtime exports, JSX helpers, components, benchmarks, demo app, website, and release workflow.",
+    "goals": [
+      "Provide a small reactive UI framework with documented package exports and examples.",
+      "Keep framework runtime, JSX helpers, built-in components, benchmarks, demo app, website, and release workflow coherent.",
+      "Preserve consumer-neutral framework behavior on top of public @sylphx/zen exports."
+    ],
+    "nonGoals": [
+      "Own one product's UI design system, routing policy, application state model, component library, or performance claim.",
+      "Own @sylphx/zen internals beyond documented package consumption.",
+      "Publish enterprise doctrine, project manifest schema, org rulesets, rollout issue reconciliation, or shared CI policy."
+    ]
+  },
+  "boundaries": {
+    "owns": [
+      {
+        "name": "zenjs-package",
+        "description": "The zenjs package exports, JSX runtime, reactive UI helpers, built-in components, type declarations, and package behavior."
+      },
+      {
+        "name": "zenjs-docs-demo",
+        "description": "Repository-local demo app, website, docs, setup notes, and examples that explain framework usage."
+      },
+      {
+        "name": "zenjs-benchmark-and-release",
+        "description": "Benchmark files, performance evidence, build config, and central release workflow wiring for this package."
+      }
+    ],
+    "doesNotOwn": [
+      "Product-specific UI design systems, routing policy, app state models, component libraries, or downstream performance narratives.",
+      "@sylphx/zen internals beyond documented package exports and dependency compatibility.",
+      "Enterprise doctrine, project manifest schema, rollout issue reconciliation, org rulesets, or shared workflow implementation."
+    ],
+    "publicSurfaces": [
+      {
+        "type": "documentation",
+        "name": "Package README",
+        "location": "README.md"
+      },
+      {
+        "type": "package-export",
+        "name": "zenjs package",
+        "location": "package.json"
+      },
+      {
+        "type": "api",
+        "name": "Framework exports",
+        "location": "src/index.ts"
+      },
+      {
+        "type": "api",
+        "name": "JSX runtime exports",
+        "location": "src/jsx-runtime.ts"
+      },
+      {
+        "type": "documentation",
+        "name": "Benchmarks",
+        "location": "BENCHMARKS.md"
+      },
+      {
+        "type": "documentation",
+        "name": "Demo app",
+        "location": "demo-app/"
+      },
+      {
+        "type": "documentation",
+        "name": "Website",
+        "location": "website/"
+      },
+      {
+        "type": "workflow",
+        "name": "Central release workflow call",
+        "location": ".github/workflows/release.yml"
+      },
+      {
+        "type": "manifest",
+        "name": "Project control-plane manifest",
+        "location": ".doctrine/project.json"
+      }
+    ],
+    "allowedDependencies": [
+      {
+        "repo": "SylphxAI/doctrine",
+        "surface": "project manifest schema, standards, and rollout audit",
+        "direction": "downward"
+      },
+      {
+        "repo": "SylphxAI/.github",
+        "surface": "central reusable release workflow",
+        "direction": "downward"
+      },
+      {
+        "repo": "SylphxAI/zen",
+        "surface": "documented @sylphx/zen package exports",
+        "direction": "downward"
+      }
+    ],
+    "forbiddenCouplings": [
+      "Do not require consumers to import internal source paths instead of documented zenjs package exports.",
+      "Do not encode one product's UI design, routing, state model, or component policy as hidden framework behavior.",
+      "Do not publish benchmark or performance claims without reproducible repository-local evidence.",
+      "Do not publish enterprise process policy from this repository instead of SylphxAI/doctrine or SylphxAI/.github."
+    ]
+  },
+  "documentation": {
+    "adr": {
+      "path": "docs/adr/",
+      "status": "planned"
+    },
+    "specs": {
+      "path": "README.md",
+      "status": "present"
+    },
+    "catalog": {
+      "path": ".doctrine/project.json",
+      "status": "present"
+    },
+    "runbooks": {
+      "path": "SETUP.md",
+      "status": "present"
+    },
+    "generatedReferences": {
+      "path": "website/",
+      "status": "present"
+    }
+  },
+  "delivery": {
+    "ciModel": "none",
+    "requiredContexts": [],
+    "deployPath": "No pull-request CI workflow is present; main pushes call .github/workflows/release.yml to delegate package release handling to the central reusable workflow.",
+    "productionProof": "Framework changes require build, typecheck, tests, benchmark evidence for changed performance claims, demo or website smoke, and package readback after release.",
+    "recoveryClass": "forward-fix-only"
+  },
+  "adoption": {
+    "status": "baseline",
+    "gaps": [
+      {
+        "id": "ci-missing",
+        "description": "Add pull-request CI for build, typecheck, tests, lint, benchmark smoke, demo, and website checks before relying on automated admission.",
+        "owner": "SylphxAI/zenjs",
+        "target": "Before full adoption"
+      },
+      {
+        "id": "release-proof-missing",
+        "description": "Document package registry readback, docs readback, and consumer smoke evidence required after package releases.",
+        "owner": "SylphxAI/zenjs",
+        "target": "Before commercial-grade framework operation"
+      },
+      {
+        "id": "benchmark-contract-missing",
+        "description": "Turn benchmark claims and comparison methodology into a stable benchmark contract or generated report.",
+        "owner": "SylphxAI/zenjs",
+        "target": "Before full package adoption"
+      }
+    ]
+  }
+}
